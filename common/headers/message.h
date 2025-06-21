@@ -1,0 +1,6 @@
+#ifndef SANDBOX_MESSAGE_H
+#define SANDBOX_MESSAGE_H
+
+
+
+#endif //SANDBOX_MESSAGE_H
