@@ -52,22 +52,37 @@ namespace http{
     }
 
     void TCPServer::handle() {
-        std::cout << "W8 for data" << std::endl;
         memset(buffer, 0, BUFFER_SIZE * sizeof(char));
         int bytes_received = recv(connection_link, buffer, BUFFER_SIZE, 0);
-        writeToConsole(buffer);
+        if(bytes_received > 0){
+            std::string tmp;
+            writeToConsole(buffer);
+            tmp = buffer;
+            if(!decoding_msg && tmp.find(http::Message::general_header) != std::string::npos) {
+                decoding_msg = true;
+            } else if(tmp.rfind(http::Message::tail) != std::string::npos){
+                decoding_msg = false;
+                writeToConsole("Full msg received =:");
+                writeToConsole(incoming_msg);
+                incoming_msg.clear();
+            } else if(decoding_msg && tmp.find(http::Message::safeguard_begin) != std::string::npos &&
+                      tmp.rfind(http::Message::safeguard_end) != std::string::npos){
+                incoming_msg += tmp.substr(http::Message::safeguard_begin.size(),
+                                           tmp.size() - http::Message::safeguard_begin.size() - http::Message::safeguard_end.size());
+            }
+        }
     }
 
     void TCPServer::respond(int c) {
-        std::string body = "Hello" + std::to_string(c);
-        std::string response =
-                "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/plain\r\n"
-                "Content-Length: " + std::to_string(body.size()) + "\r\n"
-                                                                    "\r\n" +
-                body;
-        int bytes_sent = ::send(connection_link, response.c_str(), response.size(), 0);
-        writeToConsole("Response sent");
+//        std::string body = "Hello" + std::to_string(c);
+//        std::string response =
+//                "HTTP/1.1 200 OK\r\n"
+//                "Content-Type: text/plain\r\n"
+//                "Content-Length: " + std::to_string(body.size()) + "\r\n"
+//                                                                    "\r\n" +
+//                body;
+//        int bytes_sent = ::send(connection_link, response.c_str(), response.size(), 0);
+//        writeToConsole("Response sent");
 //        ::closesocket(connection_link);
 //        writeToConsole("Closed connection");
     }

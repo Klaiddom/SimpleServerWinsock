@@ -1,7 +1,9 @@
 #ifndef SANDBOX_HTTP_SERVER_H
 #define SANDBOX_HTTP_SERVER_H
+
 #include <iostream>
 #include "../../common/headers/Socket.h"
+#include "../../common/headers/message.h"
 
 namespace http {
 
@@ -14,6 +16,8 @@ namespace http {
     int connection_link;
     bool accepted = false;
     int timeout = 1000;
+    std::string incoming_msg;
+    bool decoding_msg = false;
 
     void startup(std::string& ip_addr, int port);
 

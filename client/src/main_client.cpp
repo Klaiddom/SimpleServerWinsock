@@ -21,9 +21,8 @@ int main(){
 
     while(true){
         send_info.clear();
-
         std::cout << "Enter msg to sent: ";
-        std::cin >> send_info;
+        std::getline(std::cin, send_info);
         client.send(send_info);
         //client.disconnect();
         //break;

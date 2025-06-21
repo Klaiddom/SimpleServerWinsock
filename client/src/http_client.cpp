@@ -27,11 +27,17 @@ void TCPClient::connect(){
 }
 
 void TCPClient::send(std::string& msg){
-    int msg_size = msg.length();
-    std::cout << "Message size: " << msg_size << std::endl;
-    int bytes_sent = ::send(socket->getRaw(), msg.c_str(), msg_size, 0);
-    std::cout << "Sent:: " << bytes_sent << " bytes!" << std::endl;
-    std::cout << WSAGetLastError() << std::endl;
+
+    http::Message msg_obj(msg);
+    std::cout << "Message total size: " << msg_obj.size() << std::endl;
+    auto chunks = msg_obj.getChunks();
+    for(auto& chunk: *chunks){
+        int bytes_sent = ::send(socket->getRaw(), chunk.c_str(), chunk.size(), 0);
+        if(bytes_sent > 0)
+            std::cout << "Sent:: " << bytes_sent << " bytes!" << std::endl;
+        else
+            std::cout << WSAGetLastError() << std::endl;
+    }
 //    ::shutdown(server_socket, 1);
 }
 

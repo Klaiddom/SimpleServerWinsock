@@ -2,6 +2,7 @@
 #define SANDBOX_HTTP_CLIENT_H
 
 #include "../../common/headers/Socket.h"
+#include "../../common/headers/message.h"
 #include <string>
 
 namespace http {
