@@ -35,9 +35,10 @@ namespace http{
         while(true){
             if(!accepted)
                 accept();
-
-            handle();
-            respond(std::max(counter, 1));
+            else{
+                handle();
+                respond(std::max(counter, 1));
+            }
         }
     }
 
@@ -52,25 +53,29 @@ namespace http{
     }
 
     void TCPServer::handle() {
-        memset(buffer, 0, BUFFER_SIZE * sizeof(char));
-        int bytes_received = recv(connection_link, buffer, BUFFER_SIZE, 0);
-        if(bytes_received > 0){
-            std::string tmp;
-            writeToConsole(buffer);
-            tmp = buffer;
-            if(!decoding_msg && tmp.find(http::Message::general_header) != std::string::npos) {
-                decoding_msg = true;
-            } else if(tmp.rfind(http::Message::tail) != std::string::npos){
-                decoding_msg = false;
-                writeToConsole("Full msg received =:");
-                writeToConsole(incoming_msg);
-                incoming_msg.clear();
-            } else if(decoding_msg && tmp.find(http::Message::safeguard_begin) != std::string::npos &&
-                      tmp.rfind(http::Message::safeguard_end) != std::string::npos){
-                incoming_msg += tmp.substr(http::Message::safeguard_begin.size(),
-                                           tmp.size() - http::Message::safeguard_begin.size() - http::Message::safeguard_end.size());
-            }
-        }
+        auto msg = receiver.retrieveLastMessage(connection_link);
+        writeToConsole(*msg->getContent());
+        delete msg;
+//        memset(buffer, 0, BUFFER_SIZE * sizeof(char));
+//        int bytes_received = recv(connection_link, buffer, BUFFER_SIZE, 0);
+//        if(bytes_received > 0){
+//            std::string tmp;
+//            writeToConsole(buffer);
+//            tmp = buffer;
+//            if(!decoding_msg && tmp.find(http::Message::general_header) != std::string::npos) {
+//                decoding_msg = true;
+//            } else if(tmp.rfind(http::Message::tail) != std::string::npos){
+//                decoding_msg = false;
+//                writeToConsole("Full msg received =:");
+//                writeToConsole(incoming_msg);
+//                incoming_msg.clear();
+//            } else if(decoding_msg && tmp.find(http::Message::safeguard_begin) != std::string::npos &&
+//                      tmp.rfind(http::Message::safeguard_end) != std::string::npos){
+//                incoming_msg += tmp.substr(http::Message::safeguard_begin.size(),
+//                                           tmp.size() - http::Message::safeguard_begin.size() -
+//                                           http::Message::safeguard_end.size());
+//            }
+//        }
     }
 
     void TCPServer::respond(int c) {

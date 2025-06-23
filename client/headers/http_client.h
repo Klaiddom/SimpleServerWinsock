@@ -3,11 +3,13 @@
 
 #include "../../common/headers/Socket.h"
 #include "../../common/headers/message.h"
+#include "../../common/headers/sender.h"
 #include <string>
 
 namespace http {
     class TCPClient{
         ClientSocket* socket;
+        MessageSender sender;
         sockaddr* server_info = nullptr;
         int server_info_size = 0;
         WSAData  m_wsaData;

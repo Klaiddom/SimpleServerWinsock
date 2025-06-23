@@ -2,29 +2,24 @@
 #define SANDBOX_MESSAGE_H
 
 #include <string>
-#include <vector>
-//#include <math.h>
 
 namespace http{
 
     class Message{
-
-        std::string header;
-        std::vector<std::string> chunks;
-
-        size_t msg_size;
-        static const int max_bytes_sent = 50;
-        size_t divideIntoChunks(std::string& content);
+        std::string content;
+        int msg_size;
+        int char_pointer = 0;
 
     public:
+        Message() = default;
         Message(std::string& content);
-        ~Message();
-        std::vector<std::string>* getChunks();
-        size_t size();
-        static const std::string general_header;
-        static const std::string tail;
-        static const std::string safeguard_begin;
-        static const std::string safeguard_end;
+        Message(Message& msg);
+        ~Message() = default;
+        std::string getChunk(int chunk_size);
+        int getSize();
+        void clear();
+        std::string* getContent();
+        void update(std::string& new_content);
     };
 
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../../common/headers/Socket.h"
 #include "../../common/headers/message.h"
+#include "../../common/headers/receiver.h"
 
 namespace http {
 
@@ -18,6 +19,8 @@ namespace http {
     int timeout = 1000;
     std::string incoming_msg;
     bool decoding_msg = false;
+    MessageReceiver receiver;
+
 
     void startup(std::string& ip_addr, int port);
 
