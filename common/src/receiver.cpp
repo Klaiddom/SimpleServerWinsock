@@ -6,8 +6,8 @@ void http::MessageReceiver::processNextPacket(SOCKET connection) {
     memset(buffer, 0, BUFFER_SIZE * sizeof(char));
     int bytes_received = recv(connection, buffer, BUFFER_SIZE, 0);
     if (bytes_received > 0) {
-        auto stream = new std::stringstream();
-        *stream << buffer;
+        std::string tmp(buffer, bytes_received);
+        auto stream = new std::stringstream(tmp);
         int result = packet.deserialize(stream);
         if (result == EXIT_FAILURE)
             packet.clear();

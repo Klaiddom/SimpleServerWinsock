@@ -3,13 +3,17 @@
 void http::MessageSender::send(http::Message &msg, GeneralSocket* connected_socket) {
     http::Packet packet(http::Safeguards::MSG_BEGIN);
     std::string serialize_packet;
+    int bytes_send;
 
     *packet.serialize() >> serialize_packet;
-    ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+    bytes_send = ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+//    std::cout << "Packet size: " << serialize_packet.size() << ", Bytes send: " << bytes_send << std::endl;
 
     serialize_packet.clear();
-    serialize_packet = std::to_string(msg.getSize());
-    ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+    packet.update(std::to_string(msg.getSize()));
+    *packet.serialize() >> serialize_packet;
+    bytes_send = ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+//    std::cout << "Packet size: " << serialize_packet.size() << ", Bytes send: " << bytes_send << std::endl;
 
     bool msg_can_be_processed = true;
     int expected_packet_size = packet_size_bytes + http::Safeguards::PACKET_BEGIN.size() +
@@ -21,7 +25,8 @@ void http::MessageSender::send(http::Message &msg, GeneralSocket* connected_sock
 
         packet.update(msg.getChunk(packet_size_bytes));
         *packet.serialize() >> serialize_packet;
-        ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+        bytes_send = ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+//        std::cout << "Packet size: " << serialize_packet.size() << ", Bytes send: " << bytes_send << std::endl;
 
         if(serialize_packet.size() < expected_packet_size)
             msg_can_be_processed = false;
@@ -31,5 +36,6 @@ void http::MessageSender::send(http::Message &msg, GeneralSocket* connected_sock
     packet.update(http::Safeguards::MSG_END);
     serialize_packet.clear();
     *packet.serialize() >> serialize_packet;
-    ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+    bytes_send = ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
+//    std::cout << "Packet size: " << serialize_packet.size() << ", Bytes send: " << bytes_send << std::endl;
 }
