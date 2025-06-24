@@ -62,6 +62,8 @@ void ServerSocket::connect2network() {
 
 
 ClientSocket::ClientSocket(std::string &ip_addr, int port) : GeneralSocket(ip_addr, port){
+    int flag = 1;
+    setsockopt(getRaw(), IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int));
 }
 
 void ClientSocket::connect2network() {

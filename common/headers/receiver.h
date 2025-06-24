@@ -15,6 +15,7 @@ namespace http{
         char* buffer = new char[BUFFER_SIZE];
         Message* last_message = new Message();
         std::vector<Packet> packets;
+        ServiceInfo* si;
 
         void processNextPacket(SOCKET connection);
         void composeMessage();

@@ -5,6 +5,7 @@ void http::MessageReceiver::processNextPacket(SOCKET connection) {
     http::Packet packet;
     memset(buffer, 0, BUFFER_SIZE * sizeof(char));
     int bytes_received = recv(connection, buffer, BUFFER_SIZE, 0);
+    std::cout << "Received bytes: " << bytes_received << std::endl;
     if (bytes_received > 0) {
         std::string tmp(buffer, bytes_received);
         auto stream = new std::stringstream(tmp);
@@ -13,14 +14,17 @@ void http::MessageReceiver::processNextPacket(SOCKET connection) {
             packet.clear();
     }
 
-    if (!receiving && packet.body == http::Safeguards::MSG_BEGIN) {
+    if (!receiving && packet.isMsgStart()){
         receiving = true;
         last_message->clear();
+        auto msg_info = packet.getServiceInfo();
+        si = msg_info;
         packet.clear();
-    } else if (receiving && packet.body == http::Safeguards::MSG_END) {
+    } else if (receiving && packet.isMsgEnd()) {
         receiving = false;
         composeMessage();
         packet.clear();
+        si = nullptr;
         packets.clear();
     } else{
         packets.push_back(packet);
@@ -42,4 +46,9 @@ void http::MessageReceiver::composeMessage() {
         *msg_content += packet.body;
     }
     last_message->update(*msg_content);
+    if(last_message->getSize() != si->size){
+        std::cout << "Received msg is corrupted, expected " << si->size << " bytes, got " <<
+                    last_message->getSize() << " bytes." << std::endl;
+        last_message->clear();
+    }
 }

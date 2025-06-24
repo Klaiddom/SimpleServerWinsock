@@ -3,6 +3,8 @@
 
 #include <string>
 #include <sstream>
+#include <thread>
+#include <chrono>
 #include "message.h"
 #include "packet.h"
 #include "Socket.h"

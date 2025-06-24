@@ -6,6 +6,11 @@
 
 namespace http{
 
+    struct ServiceInfo{
+        int size = 0;
+    };
+
+
     class Packet : Serializable{
     public:
 
@@ -15,6 +20,10 @@ namespace http{
         int deserialize(std::stringstream* stream) override;
         void clear();
         void update(std::string new_body);
+        bool isMsgStart();
+        bool isMsgEnd();
+        ServiceInfo* getServiceInfo();
+
         ~Packet() = default;
 
         std::string body;
