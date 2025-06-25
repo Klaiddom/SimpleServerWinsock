@@ -2,6 +2,7 @@
 #define SANDBOX_MESSAGE_RECIEVER_H
 #include <string>
 #include <vector>
+#include <queue>
 #include "message.h"
 #include "Socket.h"
 #include "safeguards.h"
@@ -15,10 +16,12 @@ namespace http{
         char* buffer = new char[BUFFER_SIZE];
         Message* last_message = new Message();
         std::vector<Packet> packets;
-        ServiceInfo* si;
+        ServiceInfo* si = nullptr;
+        std::queue<std::string> split_packets;
 
         void processNextPacket(SOCKET connection);
         void composeMessage();
+        void splitIntoPackets(std::string& s);
 
     public:
         MessageReceiver() = default;

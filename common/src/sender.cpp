@@ -17,7 +17,7 @@ void http::MessageSender::send(http::Message &msg, GeneralSocket* connected_sock
 
     while(msg_can_be_processed){
         //Need sleep for tcp not squash multiple msg into one...
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+//        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         packet.clear();
         serialize_packet.clear();
 
@@ -34,7 +34,7 @@ void http::MessageSender::send(http::Message &msg, GeneralSocket* connected_sock
     packet.update(http::Safeguards::MSG_END);
     serialize_packet.clear();
     serialize_packet = packet.serialize()->str();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+//    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     bytes_send = ::send(connected_socket->getRaw(), serialize_packet.c_str(), serialize_packet.size(), 0);
 //    std::cout << "Packet size: " << serialize_packet.size() << ", Bytes send: " << bytes_send << std::endl;
 }

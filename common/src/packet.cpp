@@ -23,8 +23,8 @@ std::stringstream *http::Packet::serialize() {
 }
 
 int http::Packet::deserialize(std::stringstream *stream) {
-    int safeguard_size;
-    stream->read(reinterpret_cast<char *>(&safeguard_size), sizeof(safeguard_size));
+    int safeguard_size = http::Safeguards::PACKET_BEGIN.size();
+//    stream->read(reinterpret_cast<char *>(&safeguard_size), sizeof(safeguard_size));
     std::string received_safeguard;
     received_safeguard.resize(safeguard_size);
     stream->read(&received_safeguard[0], safeguard_size);
