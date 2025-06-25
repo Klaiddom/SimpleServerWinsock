@@ -33,7 +33,6 @@ target_link_libraries(server PRIVATE ws2_32)
 
 set(HEADERS_CLIENT
         client/headers/http_client.h
-        client/headers/client.h
         common/headers/Socket.h
         common/headers/message.h
         common/headers/packet.h
@@ -44,7 +43,6 @@ set(HEADERS_CLIENT
 
 set(SOURCES_CLIENT client/src/main_client.cpp
         client/src/http_client.cpp
-        client/src/client.cpp
         common/src/Socket.cpp
         common/src/message.cpp
         common/src/packet.cpp
