@@ -5,7 +5,7 @@ void http::MessageReceiver::processNextPacket(SOCKET connection) {
     http::Packet packet;
     memset(buffer, 0, BUFFER_SIZE * sizeof(char));
     int bytes_received = recv(connection, buffer, BUFFER_SIZE, 0);
-    std::cout << "Received bytes: " << bytes_received << std::endl;
+//    std::cout << "Received bytes: " << bytes_received << std::endl;
     if (bytes_received > 0) {
         std::string tmp(buffer, bytes_received);
         splitIntoPackets(tmp);

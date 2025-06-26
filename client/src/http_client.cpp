@@ -24,6 +24,8 @@ void TCPClient::connect(){
     std::cout << "Server socket: " << server_socket << std::endl;
     if(server_socket < 0)
         std::cout << "Failed to connect to server" << std::endl;
+    std::string service_info = "client_id: Client" + std::to_string(socket->getRaw());
+    send(service_info);
 }
 
 void TCPClient::send(std::string& msg){

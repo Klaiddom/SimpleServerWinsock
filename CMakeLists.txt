@@ -13,6 +13,7 @@ set(HEADERS_SERVER server/headers/main_server.h
         common/headers/serializable.h
         common/headers/safeguards.h
         common/headers/receiver.h
+        common/headers/user.h
 )
 
 set(SOURCES_SERVER server/src/main_server.cpp
@@ -23,6 +24,7 @@ set(SOURCES_SERVER server/src/main_server.cpp
         common/src/packet.cpp
         common/src/receiver.cpp
         common/src/safeguards.cpp
+        common/src/user.cpp
 )
 
 
