@@ -7,7 +7,6 @@ namespace http{
         this->connectionsPerSocket = connectionsPerSocket;
         startup(ip_addr, port);
         accept_thread = new std::thread(&TCPServer::accept, this);
-        accept_thread->join();
     };
 
     TCPServer::~TCPServer(){
@@ -32,15 +31,23 @@ namespace http{
     }
 
     void TCPServer::run(){
-//        int counter = 0;
-//        while(true){
-//            if(!accepted)
-//                accept();
-//            else{
-//                handle();
-//                respond(std::max(counter, 1));
-//            }
-//        }
+        accept_thread->detach();
+        while(true){
+            if(!received_msgs.empty()){
+                auto last_msg = received_msgs.front();
+//                std::cout << "Message is processed" << std::endl;
+                for(auto user: users){
+                    if(*user->getId() != last_msg->getFrom()){
+                        user->sendResponse(*last_msg);
+//                        std::cout << "Respond is sent" << std::endl;
+                    }
+                }
+                received_msgs.pop();
+                delete(last_msg);
+            } else{
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+        }
     }
 
     void TCPServer::accept() {
@@ -62,61 +69,29 @@ namespace http{
     void TCPServer::process_user(http::User *user){
         while(true){
             handle(user);
+            respond(user);
         }
     }
 
     void TCPServer::handle(User* user) {
-//        auto msg = receiver.retrieveLastMessage(user->getSocket()->getRaw());
-        user->receiveMsg();
         auto msg = user->getLastMsg();
-
         if(!msg)
             return;
-
         if(user->getId()){
             std::string consoleOutput;
             consoleOutput += *user->getId();
             consoleOutput += ": ";
             consoleOutput += *msg->getContent();
             writeToConsole(consoleOutput);
+
+            msg->setFrom(*user->getId());
+            received_msgs.push(msg);
         } else if(msg->getContent()->find("client_id: ") != std::string::npos){
             user->setId(msg->getContent()->substr(11, msg->getContent()->size() - 12));
         }
-        delete msg;
-//        memset(buffer, 0, BUFFER_SIZE * sizeof(char));
-//        int bytes_received = recv(connection_link, buffer, BUFFER_SIZE, 0);
-//        if(bytes_received > 0){
-//            std::string tmp;
-//            writeToConsole(buffer);
-//            tmp = buffer;
-//            if(!decoding_msg && tmp.find(http::Message::general_header) != std::string::npos) {
-//                decoding_msg = true;
-//            } else if(tmp.rfind(http::Message::tail) != std::string::npos){
-//                decoding_msg = false;
-//                writeToConsole("Full msg received =:");
-//                writeToConsole(incoming_msg);
-//                incoming_msg.clear();
-//            } else if(decoding_msg && tmp.find(http::Message::safeguard_begin) != std::string::npos &&
-//                      tmp.rfind(http::Message::safeguard_end) != std::string::npos){
-//                incoming_msg += tmp.substr(http::Message::safeguard_begin.size(),
-//                                           tmp.size() - http::Message::safeguard_begin.size() -
-//                                           http::Message::safeguard_end.size());
-//            }
-//        }
     }
 
-    void TCPServer::respond(int c) {
-//        std::string body = "Hello" + std::to_string(c);
-//        std::string response =
-//                "HTTP/1.1 200 OK\r\n"
-//                "Content-Type: text/plain\r\n"
-//                "Content-Length: " + std::to_string(body.size()) + "\r\n"
-//                                                                    "\r\n" +
-//                body;
-//        int bytes_sent = ::send(connection_link, response.c_str(), response.size(), 0);
-//        writeToConsole("Response sent");
-//        ::closesocket(connection_link);
-//        writeToConsole("Closed connection");
+    void TCPServer::respond(http::User* user) {
     }
 
 }

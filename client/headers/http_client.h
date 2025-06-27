@@ -4,16 +4,19 @@
 #include "../../common/headers/Socket.h"
 #include "../../common/headers/message.h"
 #include "../../common/headers/sender.h"
+#include "../../common/headers/user.h"
 #include <string>
+#include <thread>
 
 namespace http {
     class TCPClient{
         ClientSocket* socket;
-        MessageSender sender;
         sockaddr* server_info = nullptr;
         int server_info_size = 0;
-        WSAData  m_wsaData;
-        SOCKET server_socket;
+        WSAData m_wsaData;
+        User* user;
+        std::thread* listen_thread;
+
 
     public:
         TCPClient(std::string& ip_addr, int port);
@@ -21,6 +24,7 @@ namespace http {
         void setServerAddress(sockaddr* server2connect, int size);
         void connect();
         void send(std::string& msg);
+        void listen();
         void disconnect();
     };
 }

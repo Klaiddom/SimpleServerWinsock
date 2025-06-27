@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(HEADERS_SERVER server/headers/main_server.h
         server/headers/http_server.h
-        server/headers/server.h
         common/headers/Socket.h
         common/headers/message.h
         common/headers/packet.h
@@ -14,17 +13,18 @@ set(HEADERS_SERVER server/headers/main_server.h
         common/headers/safeguards.h
         common/headers/receiver.h
         common/headers/user.h
+        common/headers/sender.h
 )
 
 set(SOURCES_SERVER server/src/main_server.cpp
         server/src/http_server.cpp
-        server/src/server.cpp
         common/src/Socket.cpp
         common/src/message.cpp
         common/src/packet.cpp
         common/src/receiver.cpp
         common/src/safeguards.cpp
         common/src/user.cpp
+        common/src/sender.cpp
 )
 
 
@@ -41,6 +41,8 @@ set(HEADERS_CLIENT
         common/headers/serializable.h
         common/headers/safeguards.h
         common/headers/sender.h
+        common/headers/user.h
+        common/headers/receiver.h
 )
 
 set(SOURCES_CLIENT client/src/main_client.cpp
@@ -50,6 +52,8 @@ set(SOURCES_CLIENT client/src/main_client.cpp
         common/src/packet.cpp
         common/src/sender.cpp
         common/src/safeguards.cpp
+        common/src/user.cpp
+        common/src/receiver.cpp
 )
 
 

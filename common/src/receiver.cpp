@@ -5,9 +5,9 @@ void http::MessageReceiver::processNextPacket(SOCKET connection) {
     http::Packet packet;
     memset(buffer, 0, BUFFER_SIZE * sizeof(char));
     int bytes_received = recv(connection, buffer, BUFFER_SIZE, 0);
-//    std::cout << "Received bytes: " << bytes_received << std::endl;
     if (bytes_received > 0) {
         std::string tmp(buffer, bytes_received);
+//        std::cout << tmp << std::endl;
         splitIntoPackets(tmp);
     }
     if(split_packets.size() > 1)
@@ -43,16 +43,16 @@ http::Message* http::MessageReceiver::retrieveLastMessage(SOCKET connection) {
     while (last_message->getSize() == 0) {
         processNextPacket(connection);
     }
-    auto msg_copy = new Message(*last_message);
+    auto msg_copy = new http::Message(*last_message);
     return msg_copy;
 }
 
 void http::MessageReceiver::composeMessage() {
-    auto msg_content = new std::string();
+    std::string msg_content;
     for (auto &packet: packets) {
-        *msg_content += packet.body;
+        msg_content += packet.body;
     }
-    last_message->update(*msg_content);
+    last_message->update(msg_content);
     if(last_message->getSize() != si->size){
         std::cout << "Received msg is corrupted, expected " << si->size << " bytes, got " <<
                     last_message->getSize() << " bytes." << std::endl;

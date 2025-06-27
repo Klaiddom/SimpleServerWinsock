@@ -20,36 +20,37 @@ void TCPClient::connect(){
     if(server_info == nullptr)
         std::cerr << "NO server to connect to" << std::endl;
     std::cout << "Trying to connect" << std::endl;
-    server_socket = ::connect(socket->getRaw(), server_info, server_info_size);
+    auto server_socket = ::connect(socket->getRaw(), server_info, server_info_size);
     std::cout << "Server socket: " << server_socket << std::endl;
     if(server_socket < 0)
         std::cout << "Failed to connect to server" << std::endl;
-    std::string service_info = "client_id: Client" + std::to_string(socket->getRaw());
+    user = new User(socket);
+    user->setId("Client" + std::to_string(socket->getRaw()));
+    std::string service_info = "client_id: " + *user->getId();
     send(service_info);
+    listen_thread = new std::thread(&TCPClient::listen, this);
+    listen_thread->detach();
 }
 
 void TCPClient::send(std::string& msg){
-
-    http::Message msg_obj(msg);
-    sender.send(msg_obj, socket);
-//    std::cout << "Message total size: " << msg_obj.getSize() << std::endl;
-//    auto chunks = msg_obj.getChunks();
-//    for(auto& chunk: *chunks){
-//        int bytes_sent = ::send(socket->getRaw(), chunk.c_str(), chunk.size(), 0);
-//        if(bytes_sent > 0)
-//            std::cout << "Sent:: " << bytes_sent << " bytes!" << std::endl;
-//        else
-//            std::cout << WSAGetLastError() << std::endl;
-//    }
-//    ::shutdown(server_socket, 1);
+    http::Message msg_obj(msg, *user->getId());
+    user->sendResponse(msg_obj);
 }
 
 void TCPClient::disconnect(){
-    ::closesocket(server_socket);
+    ::closesocket(socket->getRaw());
 }
 
 TCPClient::~TCPClient(){
     delete socket;
     WSACleanup();
+}
+
+void TCPClient::listen(){
+    while(true){
+        auto msg = user->getLastMsg();
+        if(msg)
+            std::cout << *msg->getContent() << std::endl;
+    }
 }
 
