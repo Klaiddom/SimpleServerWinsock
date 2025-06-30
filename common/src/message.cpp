@@ -47,6 +47,20 @@ void http::Message::update(std::string &new_content) {
     msg_size = content.size();
 }
 
+void http::Message::setTo(std::string &user_id){
+    if(user_id.find(http::Safeguards::INFO_TO) != std::string::npos)
+        to = user_id.substr(http::Safeguards::INFO_TO.size(), user_id.size() - http::Safeguards::INFO_TO.size());
+    else
+        to = user_id;
+}
+
+void http::Message::setFrom(std::string &user_id) {
+    if(user_id.find(http::Safeguards::INFO_FROM) != std::string::npos)
+        from = user_id.substr(http::Safeguards::INFO_FROM.size(), user_id.size() - http::Safeguards::INFO_FROM.size());
+    else
+        from = user_id;
+}
+
 std::string& http::Message::getFrom(){
     return from;
 }

@@ -7,10 +7,13 @@
 #include "../../common/headers/user.h"
 #include <string>
 #include <thread>
+#include <chrono>
 
 namespace http {
     class TCPClient{
-        ClientSocket* socket;
+        MessageSender sender;
+        MessageReceiver receiver;
+        const int modulo = 10000;
         sockaddr* server_info = nullptr;
         int server_info_size = 0;
         WSAData m_wsaData;
@@ -24,9 +27,10 @@ namespace http {
         void setServerAddress(sockaddr* server2connect, int size);
         void connect();
         void send(std::string& msg);
+        void send(std::string& msg, std::string& to_user_id);
+        void start_listen();
         void listen();
-        void disconnect();
     };
 }
 
-#endif //SANDBOX_HTTP_CLIENT_H
+#endif

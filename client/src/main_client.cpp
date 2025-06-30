@@ -14,10 +14,11 @@ int main(){
     server_info.sin_addr.s_addr = inet_addr(ip_addr.c_str());
     server_info.sin_port = htons(8001);
 
-    http::TCPClient client = http::TCPClient(ip_addr, 8002);
+    http::TCPClient client(ip_addr, 8002);
     client.setServerAddress((sockaddr *) &server_info, sizeof(server_info));
     std::cout << "Server address is set" << std::endl;
     client.connect();
+    client.start_listen();
 
     while(true){
         send_info.clear();

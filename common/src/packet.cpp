@@ -64,6 +64,18 @@ bool http::Packet::isMsgEnd() {
     return body == http::Safeguards::MSG_END;
 }
 
+bool http::Packet::isFrom(){
+    if(body.size() < http::Safeguards::INFO_FROM.size())
+        return false;
+    return body.substr(0, http::Safeguards::INFO_FROM.size()) == http::Safeguards::INFO_FROM;
+}
+
+bool http::Packet::isTo(){
+    if(body.size() < http::Safeguards::INFO_TO.size())
+        return false;
+    return body.substr(0, http::Safeguards::INFO_TO.size()) == http::Safeguards::INFO_TO;
+}
+
 http::ServiceInfo* http::Packet::getServiceInfo() {
     if(!isMsgStart())
         return nullptr;

@@ -2,6 +2,7 @@
 #define SANDBOX_MESSAGE_H
 
 #include <string>
+#include "safeguards.h"
 
 namespace http{
 
@@ -23,6 +24,7 @@ namespace http{
         void clear();
         std::string& getFrom();
         void setFrom(std::string& user_id);
+        void setTo(std::string& user_id);
         std::string* getContent();
         void update(std::string& new_content);
     };

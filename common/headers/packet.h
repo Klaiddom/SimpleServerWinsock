@@ -22,6 +22,8 @@ namespace http{
         void update(std::string new_body);
         bool isMsgStart();
         bool isMsgEnd();
+        bool isFrom();
+        bool isTo();
         ServiceInfo* getServiceInfo();
 
         ~Packet() = default;

@@ -1,4 +1,3 @@
-
 #include "../headers/http_client.h"
 
 using namespace http;
@@ -8,7 +7,11 @@ TCPClient::TCPClient(std::string& ip_addr, int port){
         std::cerr << "WSAStartup failed" << std::endl;
     }
     std::cout << "Creating client socket" << std::endl;
-    socket = new ClientSocket(ip_addr, port);
+    auto socket = new ClientSocket(ip_addr, port);
+    user = new User(socket);
+    auto now = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch() );
+    std::string user_id = "Client" + std::to_string(now.count() % modulo);
+    user->setId(user_id);
 }
 
 void TCPClient::setServerAddress(sockaddr* server2connect, int size){
@@ -20,35 +23,47 @@ void TCPClient::connect(){
     if(server_info == nullptr)
         std::cerr << "NO server to connect to" << std::endl;
     std::cout << "Trying to connect" << std::endl;
-    auto server_socket = ::connect(socket->getRaw(), server_info, server_info_size);
-    std::cout << "Server socket: " << server_socket << std::endl;
-    if(server_socket < 0)
+    SOCKET socket = user->getUserData()->socket->getRaw();
+    auto server_connection_result = ::connect(socket, server_info, server_info_size);
+    if(server_connection_result < 0)
         std::cout << "Failed to connect to server" << std::endl;
-    user = new User(socket);
-    user->setId("Client" + std::to_string(socket->getRaw()));
-    std::string service_info = "client_id: " + *user->getId();
+    else
+        std::cout << "Successfully connected to server" << std::endl;
+    std::string service_info = "client_id: " + user->getId();
     send(service_info);
+}
+
+void TCPClient::send(std::string& msg){
+    http::Message msg_obj(msg);
+    std::string from = user->getId();
+    msg_obj.setFrom(from);
+    std::string to = "all";
+    msg_obj.setTo(to);
+    sender.send(msg_obj, user->getUserData()->socket);
+}
+
+void TCPClient::send(std::string &msg, std::string &to_user_id) {
+    http::Message msg_obj(msg);
+    std::string from = user->getId();
+    msg_obj.setFrom(from);
+    msg_obj.setTo(to_user_id);
+    sender.send(msg_obj, user->getUserData()->socket);
+}
+
+TCPClient::~TCPClient(){
+    delete user;
+    WSACleanup();
+}
+
+void TCPClient::start_listen() {
     listen_thread = new std::thread(&TCPClient::listen, this);
     listen_thread->detach();
 }
 
-void TCPClient::send(std::string& msg){
-    http::Message msg_obj(msg, *user->getId());
-    user->sendResponse(msg_obj);
-}
-
-void TCPClient::disconnect(){
-    ::closesocket(socket->getRaw());
-}
-
-TCPClient::~TCPClient(){
-    delete socket;
-    WSACleanup();
-}
-
 void TCPClient::listen(){
+    SOCKET connected_socket = user->getUserData()->socket->getRaw();
     while(true){
-        auto msg = user->getLastMsg();
+        auto msg = receiver.retrieveLastMessage(connected_socket);
         if(msg)
             std::cout << *msg->getContent() << std::endl;
     }

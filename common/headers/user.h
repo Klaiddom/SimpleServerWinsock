@@ -12,26 +12,19 @@ namespace http {
 
     struct UserServiceData {
         GeneralSocket *socket = nullptr;
-        std::string *id = nullptr;
+        std::string id;
     };
 
     class User {
         UserServiceData data;
-        MessageReceiver receiver;
-        MessageSender sender;
-        std::queue<Message*> incoming;
-        std::thread* receive_thread;
-
+        void attachSocket(GeneralSocket *socket);
 
     public:
         User(GeneralSocket *socket);
         User() = default;
         void setId(std::string id);
-        void attachSocket(GeneralSocket *socket);
-        std::string* getId();
-        void receiveMsg();
-        Message* getLastMsg();
-        void sendResponse(http::Message& msg);
+        std::string getId();
+        UserServiceData* getUserData();
         ~User() = default;
     };
 }

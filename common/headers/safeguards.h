@@ -7,6 +7,8 @@ namespace http {
         static const std::string PACKET_END;
         static const std::string MSG_BEGIN;
         static const std::string MSG_END;
+        static const std::string INFO_FROM;
+        static const std::string INFO_TO;
     };
 }
 #endif
