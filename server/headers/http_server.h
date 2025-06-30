@@ -6,7 +6,7 @@
 #include <thread>
 #include "../../common/headers/Socket.h"
 #include "../../common/headers/message.h"
-#include "../../common/headers/receiver.h"
+#include "../../common/headers/poll_receiver.h"
 #include "../../common/headers/user.h"
 
 namespace http {
@@ -14,22 +14,20 @@ namespace http {
     class TCPServer {
         ServerSocket* serverSocket;
         WSAData  m_wsaData;
-        int connectionsPerSocket;
-        std::vector<User* > users;
-        std::vector<std::thread* > active_user_threads;
+        const int size_of_queue_in = 10;
+        std::map<std::string, User* > users;
         std::thread* accept_thread;
-        std::queue<Message*> received_msgs;
+        POLLReceiver* receiver;
+        MessageSender sender;
 
 
         void startup(std::string& ip_addr, int port);
 
         void accept();
-        void handle(User* user);
-        void respond(User* user);
-        void process_user(User* user);
+        void outputMessage(Message* msg);
 
         public:
-            TCPServer(std::string& ip_addr, int port, int connectionsPerSocket);
+            TCPServer(std::string& ip_addr, int port);
             ~TCPServer();
             void run();
             void shutdown();

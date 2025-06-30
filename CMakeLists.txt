@@ -11,7 +11,7 @@ set(HEADERS_SERVER server/headers/main_server.h
         common/headers/packet.h
         common/headers/serializable.h
         common/headers/safeguards.h
-        common/headers/receiver.h
+        common/headers/poll_receiver.h
         common/headers/user.h
         common/headers/sender.h
 )
@@ -21,7 +21,7 @@ set(SOURCES_SERVER server/src/main_server.cpp
         common/src/Socket.cpp
         common/src/message.cpp
         common/src/packet.cpp
-        common/src/receiver.cpp
+        common/src/poll_receiver.cpp
         common/src/safeguards.cpp
         common/src/user.cpp
         common/src/sender.cpp

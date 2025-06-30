@@ -21,6 +21,7 @@ namespace http{
         ~Message() = default;
         std::string getChunk(int chunk_size);
         int getSize();
+        std::string getTo();
         void clear();
         std::string& getFrom();
         void setFrom(std::string& user_id);

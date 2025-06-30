@@ -64,3 +64,7 @@ void http::Message::setFrom(std::string &user_id) {
 std::string& http::Message::getFrom(){
     return from;
 }
+
+std::string http::Message::getTo() {
+    return to;
+}

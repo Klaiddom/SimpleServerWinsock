@@ -48,7 +48,7 @@ void http::POLLReceiver::process() {
                     if(received_bytes <= 0){
                         removed_list.push_back(poll_group[i].fd);
                     } else{
-                        extractMessages(poll_group[i].fd);
+                        extractMessages(poll_group[i].fd, received_bytes);
                     }
                 }
             }
@@ -66,6 +66,8 @@ void http::POLLReceiver::extractMessages(SOCKET socket, int received_bytes) {
     for(auto p: *split_buffer)
         packets[socket].push_back(p);
 
+    delete split_buffer;
+
     Message* msg = composeMessage(socket);
     if(msg){
         msgs[socket].push(msg);
@@ -82,7 +84,7 @@ std::queue<http::Message* >* http::POLLReceiver::getMessages(GeneralSocket *sock
 
 std::vector<http::Packet* >* http::POLLReceiver::splitIntoPackets(int received_bytes) {
     int i = 0;
-    std::vector<http::Packet* > split_packets;
+    auto split_packets = new std::vector<http::Packet* >();
     std::string s(input_buffer, received_bytes);
     std::string packet_string;
     std::stringstream ss;
@@ -94,12 +96,12 @@ std::vector<http::Packet* >* http::POLLReceiver::splitIntoPackets(int received_b
             ss << s.substr(begin, end + http::Safeguards::PACKET_END.size() - begin);
             auto packet = new Packet();
             packet->deserialize(&ss);
-            split_packets.push_back(packet);
+            split_packets->push_back(packet);
             i = end + http::Safeguards::PACKET_END.size();
         } else
             break;
     }
-    return &split_packets;
+    return split_packets;
 }
 
 http::Message* http::POLLReceiver::composeMessage(SOCKET socket) {
@@ -117,17 +119,17 @@ http::Message* http::POLLReceiver::composeMessage(SOCKET socket) {
     if(msg_begin == -1 || msg_end == -1)
         return nullptr;
 
-    Message msg;
+    auto msg = new Message();
 
     for(int i=msg_begin; i <= msg_end; i++) {
             auto packet = packets[socket][i];
             if(packet->isFrom())
-                msg.setFrom(packet->body);
+                msg->setFrom(packet->body);
             else if(packet->isTo())
-                msg.setTo(packet->body);
+                msg->setTo(packet->body);
             else
                 msg_content += packet->body;
     }
-    msg.update(msg_content);
-    return &msg;
+    msg->update(msg_content);
+    return msg;
 }

@@ -30,7 +30,8 @@ void TCPClient::connect(){
     else
         std::cout << "Successfully connected to server" << std::endl;
     std::string service_info = "client_id: " + user->getId();
-    send(service_info);
+    std::string to = user->getId();
+    send(service_info, to);
 }
 
 void TCPClient::send(std::string& msg){
@@ -65,7 +66,7 @@ void TCPClient::listen(){
     while(true){
         auto msg = receiver.retrieveLastMessage(connected_socket);
         if(msg)
-            std::cout << *msg->getContent() << std::endl;
+            std::cout << msg->getFrom() << ": " << *msg->getContent() << std::endl;
     }
 }
 

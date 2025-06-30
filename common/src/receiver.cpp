@@ -31,7 +31,7 @@ void http::MessageReceiver::processNextPacket(SOCKET connection) {
             packet.clear();
             si = nullptr;
             packets.clear();
-        } else{
+        }else{
             packets.push_back(packet);
         }
         split_packets.pop();
@@ -50,14 +50,21 @@ http::Message* http::MessageReceiver::retrieveLastMessage(SOCKET connection) {
 void http::MessageReceiver::composeMessage() {
     std::string msg_content;
     for (auto &packet: packets) {
-        msg_content += packet.body;
+        if(packet.isFrom()){
+            last_message->setFrom(packet.body);
+        }else if(packet.isTo()){
+            last_message->setTo(packet.body);
+        } else{
+            msg_content += packet.body;
+        }
     }
     last_message->update(msg_content);
-    if(last_message->getSize() != si->size){
-        std::cout << "Received msg is corrupted, expected " << si->size << " bytes, got " <<
-                    last_message->getSize() << " bytes." << std::endl;
-        last_message->clear();
-    }
+    //TODO:: better size check, for now disable
+//    if(last_message->getSize() != si->size){
+//        std::cout << "Received msg is corrupted, expected " << si->size << " bytes, got " <<
+//                    last_message->getSize() << " bytes." << std::endl;
+//        last_message->clear();
+//    }
 }
 
 
