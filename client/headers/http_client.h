@@ -19,16 +19,21 @@ namespace http {
         WSAData m_wsaData;
         User* user;
         std::thread* listen_thread;
+        bool is_connected = false;
+
+        void creationProtocol(std::string& ip_addr, int port);
 
 
     public:
         TCPClient(std::string& ip_addr, int port);
+        TCPClient(std::string& login, std::string& ip_addr, int port);
         ~TCPClient();
         void setServerAddress(sockaddr* server2connect, int size);
         void connect();
         void send(std::string& msg);
         void send(std::string& msg, std::string& to_user_id);
         void start_listen();
+        void disconnect();
         void listen();
     };
 }

@@ -36,26 +36,17 @@ void http::POLLReceiver::removeConnection(SOCKET raw_socket) {
 
 void http::POLLReceiver::process() {
     int received_bytes;
-    std::vector<SOCKET> removed_list;
     while(true){
-        removed_list.clear();
         int result = WSAPoll(poll_group, connected_users, wait_millisecond);
         if(result > 0){
             for(int i=0; i < connected_users; i++){
                 if(poll_group[i].revents & POLLRDNORM){
                     memset(input_buffer, 0, buffer_size);
                     received_bytes = recv(poll_group[i].fd, input_buffer, buffer_size, 0);
-                    if(received_bytes <= 0){
-                        removed_list.push_back(poll_group[i].fd);
-                    } else{
+                    if(received_bytes > 0)
                         extractMessages(poll_group[i].fd, received_bytes);
-                    }
                 }
             }
-        }
-        if(!removed_list.empty()) {
-            for (auto &elem: removed_list)
-                removeConnection(elem);
         }
     }
 }
@@ -132,4 +123,8 @@ http::Message* http::POLLReceiver::composeMessage(SOCKET socket) {
     }
     msg->update(msg_content);
     return msg;
+}
+
+int http::POLLReceiver::size(){
+    return connected_users;
 }

@@ -16,6 +16,7 @@ namespace http {
         WSAData  m_wsaData;
         const int size_of_queue_in = 10;
         std::map<std::string, User* > users;
+        std::queue<User*> disconnect_queue;
         std::thread* accept_thread;
         POLLReceiver* receiver;
         MessageSender sender;
@@ -31,7 +32,8 @@ namespace http {
             ~TCPServer();
             void run();
             void shutdown();
-
+            void checkIsDisconnect(Message* msg);
+            void porcessDisconnects();
             void writeToConsole(std::string msg);
     };
 

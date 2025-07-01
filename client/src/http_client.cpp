@@ -3,15 +3,23 @@
 using namespace http;
 
 TCPClient::TCPClient(std::string& ip_addr, int port){
+    creationProtocol(ip_addr, port);
+    auto now = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch() );
+    std::string user_id = "Client" + std::to_string(now.count() % modulo);
+    user->setId(user_id);
+}
+TCPClient::TCPClient(std::string &login, std::string &ip_addr, int port) {
+    creationProtocol(ip_addr, port);
+    user->setId(login);
+}
+
+void TCPClient::creationProtocol(std::string &ip_addr, int port) {
     if(WSAStartup(MAKEWORD(2, 0), &m_wsaData) != 0){
         std::cerr << "WSAStartup failed" << std::endl;
     }
     std::cout << "Creating client socket" << std::endl;
     auto socket = new ClientSocket(ip_addr, port);
     user = new User(socket);
-    auto now = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch() );
-    std::string user_id = "Client" + std::to_string(now.count() % modulo);
-    user->setId(user_id);
 }
 
 void TCPClient::setServerAddress(sockaddr* server2connect, int size){
@@ -32,6 +40,7 @@ void TCPClient::connect(){
     std::string service_info = "client_id: " + user->getId();
     std::string to = user->getId();
     send(service_info, to);
+    is_connected = true;
 }
 
 void TCPClient::send(std::string& msg){
@@ -52,6 +61,10 @@ void TCPClient::send(std::string &msg, std::string &to_user_id) {
 }
 
 TCPClient::~TCPClient(){
+    disconnect();
+    if(listen_thread->joinable())
+        listen_thread->join();
+    delete listen_thread;
     delete user;
     WSACleanup();
 }
@@ -61,9 +74,16 @@ void TCPClient::start_listen() {
     listen_thread->detach();
 }
 
+void TCPClient::disconnect() {
+    std::string disconnect_str = http::Safeguards::DISCONNECT;
+    send(disconnect_str);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    is_connected = false;
+}
+
 void TCPClient::listen(){
     SOCKET connected_socket = user->getUserData()->socket->getRaw();
-    while(true){
+    while(is_connected){
         auto msg = receiver.retrieveLastMessage(connected_socket);
         if(msg)
             std::cout << msg->getFrom() << ": " << *msg->getContent() << std::endl;

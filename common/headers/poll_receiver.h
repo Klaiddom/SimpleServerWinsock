@@ -37,6 +37,7 @@ namespace http{
         void start();
         std::queue<Message*>* getMessages(GeneralSocket* socket);
         void removeConnection(SOCKET raw_socket);
+        int size();
         ~POLLReceiver();
     };
 }

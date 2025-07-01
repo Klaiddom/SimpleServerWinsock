@@ -9,6 +9,7 @@ namespace http {
         static const std::string MSG_END;
         static const std::string INFO_FROM;
         static const std::string INFO_TO;
+        static const std::string DISCONNECT;
     };
 }
 #endif

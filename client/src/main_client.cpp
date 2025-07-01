@@ -1,7 +1,3 @@
-//
-// Created by ablaj on 20.06.2025.
-//
-
 #include <iostream>
 #include "../headers/http_client.h"
 
@@ -14,7 +10,9 @@ int main(){
     server_info.sin_addr.s_addr = inet_addr(ip_addr.c_str());
     server_info.sin_port = htons(8001);
 
-    http::TCPClient client(ip_addr, 8002);
+    std::cout << "Enter your nickname: ";
+    std::getline(std::cin, send_info);
+    http::TCPClient client(send_info, ip_addr, 8002);
     client.setServerAddress((sockaddr *) &server_info, sizeof(server_info));
     std::cout << "Server address is set" << std::endl;
     client.connect();
@@ -22,11 +20,12 @@ int main(){
 
     while(true){
         send_info.clear();
-        std::cout << "Enter msg to sent: ";
         std::getline(std::cin, send_info);
+        if(send_info == "exit()"){
+            client.disconnect();
+            break;
+        }
         client.send(send_info);
-        //client.disconnect();
-        //break;
     }
     return EXIT_SUCCESS;
 }
